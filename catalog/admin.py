@@ -9,6 +9,7 @@ from .models import Author, Book, BookInstance, Genre
 class AuthorAdmin(admin.ModelAdmin):
     list_display = ('last_name', 'first_name', 'date_of_birth',
     'date_of_death')
+    fields = ['first_name', 'last_name', ('date_of_birth', 'date_of_death')]
 admin.site.register(Author, AuthorAdmin)
 
 @admin.register(Book)
@@ -17,7 +18,18 @@ class BookAdmin(admin.ModelAdmin):
 
 @admin.register(BookInstance)
 class BookInstanceAdmin(admin.ModelAdmin):
-    pass
+    list_display = ('status', 'due_back')
+
+    fieldsets = (
+        (None, {
+            'fields': ('book', 'imprint', 'id')
+        }),
+        ('Availability', {
+            'fields': ('status', 'due_back')
+        }
+
+        ),
+    )
 
 admin.site.register(Genre)
 
