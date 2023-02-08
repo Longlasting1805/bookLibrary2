@@ -63,6 +63,11 @@ class BookInstance(models.Model):
     def __str__(self):
         return f'{self.id} ({self.book.title})'
 
+    @property
+    def is_overdue(self):
+        """Determines if the book is overdue based on due date and current date."""
+        return bool(self.due_back.date() and date.today() > self.due_back.date())     
+
 class Author(models.Model):
     first_name = models.CharField(max_length=100)
     last_name = models.CharField(max_length=100)
@@ -78,8 +83,5 @@ class Author(models.Model):
     def __str__(self):
         return f'{self.last_name}, {self.first_name}'
 
-    @property
-    def is_overdue(self):
-        """Determines if the book is overdue based on due date and current date."""
-        return bool(self.due_back and date.today() > self.due_back)    
+      
 
