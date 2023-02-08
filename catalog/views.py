@@ -7,6 +7,10 @@ from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 from catalog.forms import RenewBookForm
+from django.contrib.auth.decorators import login_required, permission_required
+from django.views.generic.edit import CreateView, UpdateView, DeleteView
+from django.urls import reverse_lazy
+from catalog.models import Author
 # Create your views here.
 
 def index(request):
@@ -52,8 +56,9 @@ class LoanedBooksByUserListView(LoginRequiredMixin,generic.ListView):
 
     def get_queryset(self):
         return BookInstance.objects.filter(borrower=self.request.user).filter(status__exact='o').order_by('due_back')
+
 @login_required
-@permission_required('catalog.can_mark_returned', raise_exception=True)
+@permission_required('perms.catalog.can_mark_returned', raise_exception=True)
 def renew_book_liberian(request, pk):
     book_instance = get_object_or_404(BookInstance, pk)
 
@@ -74,4 +79,18 @@ def renew_book_liberian(request, pk):
             'book_instance': book_instance,
         }
 
-        return render(request, 'catalog/book_renew_liberian.html', context)        
+        return render(request, 'catalog/book_renew_liberian.html', context)  
+
+
+class AuthorCreate(CreateView):
+    model = Author
+    fields = ['first_name', 'last_name', 'date_of_birth', 'date_of_death']
+    initial = {'date_of_death': '11/06/2020'}
+
+class AuthorUpdate(UpdateView):
+    model = Author
+    fields = '__all__' # Not recommended (potential security issue if more fields added)
+
+class AuthorDelete(DeleteView):
+    Model = Author
+    success_url = reverse_lazy('authors')        
